@@ -37,10 +37,10 @@ public class Payment {
     private Instant dueDate;
 
     @Column(name = "payment_amount")
-    private Integer amount;
+    private Double amount;
 
     @Column(name = "payment_discount")
-    private Integer discount;
+    private Double discount;
 
     @Column(name = "payment_comment")
     private String comment;

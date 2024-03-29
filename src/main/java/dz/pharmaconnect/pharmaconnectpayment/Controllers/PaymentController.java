@@ -37,9 +37,10 @@ public class PaymentController {
 
     @PostMapping("/createPayment")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPayment(@RequestBody PaymentRequest paymentRequest) {
-        paymentService.createPayment(paymentRequest);
+    public ResponseEntity<String> createPayment(@RequestBody PaymentRequest paymentRequest) {
+        String url = paymentService.createPayment(paymentRequest);
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(url);
     }
 
 }

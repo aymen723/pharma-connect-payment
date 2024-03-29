@@ -27,13 +27,13 @@ public class PaymentService {
         return paymentRepo.findAll();
     }
 
-    public void createPayment(PaymentRequest paymentRequest) {
+    public String createPayment(PaymentRequest paymentRequest) {
         Payment payment = Payment.builder()
                 .pharmacyId(paymentRequest.getPharmacyId())
                 .userId(paymentRequest.getUserId())
                 .amount(paymentRequest.getCheckoutPrice())
                 .comment("test")
-                .discount(5)
+                .discount(5.0)
                 .invoiceNumber(1)
                 .paymentStatus(Status.PENDING)
                 .option(PaymentMethod.EDAHABIA)
@@ -45,29 +45,40 @@ public class PaymentService {
         Invoice invoice = new Invoice(
                 "Chakhoum Ahmed",
                 "rainxh11@gmail.com",
-                5.0,
+                payment.getDiscount(),
                 "https://backend.com/webhook_endpoint",
                 "https://frontend.com",
-                PaymentMethod.EDAHABIA,
-                "5001",
-                10000.0);
+                payment.getOption(),
+                payment.getInvoiceNumber().toString(),
+                payment.getAmount());
 
         try {
 
             ChargilyResponse response = client.submitInvoice(invoice);
             if (response.isSuccess()) {
+                System.out.println("am here inside the if ");
                 response.getStatusCode();
                 response.getCheckoutUrl();
                 System.out.println(response.getStatusCode());
                 System.out.println(response.getCheckoutUrl());
+
+                return response.getCheckoutUrl();
             } else {
+                System.out.println("am here inside the eles ");
+
                 response.getStatusCode();
                 response.getErrorBody();
+                return response.getErrorBody();
+
             }
 
         } catch (Exception e) {
+            System.out.println("am here inside the eles ");
+
             System.out.println(e.getMessage());
         }
+
+        return "Couldnt create payment";
 
     }
 

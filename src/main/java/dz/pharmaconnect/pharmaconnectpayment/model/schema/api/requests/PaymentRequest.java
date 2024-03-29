@@ -22,7 +22,7 @@ public class PaymentRequest {
     private Integer pharmacyId;
 
     @NonNull
-    private Integer checkoutPrice;
+    private Double checkoutPrice;
 
     @NonNull
     private Integer userId;
