@@ -20,12 +20,15 @@ import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
 public class Payment {
 
     @Id
-    // @GeneratedValue(strategy = GeneratedValue.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
     private Integer paymentId;
 
     @Column(name = "payment_user_id")
-    private User user;
+    private Integer userId;
+
+    @Column(name = "payment_pharmacy_id")
+    private Integer pharmacyId;
 
     @Column(name = "payment_invoice_number")
     private Integer invoiceNumber;
@@ -43,6 +46,7 @@ public class Payment {
     private String comment;
 
     @Column(name = "payment_status")
+    @Enumerated(EnumType.STRING)
     private Status paymentStatus;
 
     @Column(name = "payment_option")
