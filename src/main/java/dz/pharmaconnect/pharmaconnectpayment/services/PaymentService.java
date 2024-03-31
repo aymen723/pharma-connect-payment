@@ -35,7 +35,7 @@ public class PaymentService {
                 .comment("test")
                 .discount(5.0)
                 .invoiceNumber(1L)
-                .paymentStatus(Status.PENDING)
+                .paymentStatus(Status.pending)
                 .option(PaymentMethod.EDAHABIA)
                 .dueDate(paymentRequest.getOrderDate())
                 .build();

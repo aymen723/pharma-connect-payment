@@ -45,9 +45,9 @@ public class PaymentController {
     }
 
     @PostMapping("/status")
-    public void status(@RequestBody InvoiceResponse object) {
+    public ResponseEntity<String> status(@RequestBody Invoice object) {
 
-        System.out.println(object.getInvoice().getClient());
+        System.out.println(object.getClient());
         // ObjectMapper mapper = new ObjectMapper();
         // try {
         // ConfirmationResponse obj = mapper.readValue(object,
@@ -57,6 +57,6 @@ public class PaymentController {
         // } catch (JsonProcessingException e) {
         // System.out.println(e.getMessage());
         // }
-        // return ResponseEntity.status(HttpStatus.ACCEPTED).body("worked");
+         return ResponseEntity.status(HttpStatus.ACCEPTED).body("worked");
     }
 }

@@ -1,9 +1,14 @@
 package dz.pharmaconnect.pharmaconnectpayment.model.schema.api.responses;
 
 import java.time.Instant;
+import java.util.Date;
 
 import chargily.epay.java.PaymentMethod;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,15 +27,16 @@ public class Invoice {
 
     private String client_email;
 
-    private Integer invoice_number;
+    private String invoice_number;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     private Double amount;
 
     private Double fee;
 
-    private Double discount;
+    private Integer discount;
 
     private Double due_amount;
 
@@ -38,22 +44,23 @@ public class Invoice {
 
     private PaymentMethod mode;
 
+    @JsonProperty(value = "new")
     private Integer New;
-
+    //
     private Integer tos;
 
     private String back_url;
-
+    //
     private String invoice_token;
-
+    //
     private Integer api_key_id;
-
+    //
     private Integer meta_data;
+    //
+    private Date due_date;
+    //
+    private Date created_at;
 
-    private Instant due_date;
-
-    private Instant created_at;
-
-    private Instant updated_at;
+    private Date updated_at;
 
 }
