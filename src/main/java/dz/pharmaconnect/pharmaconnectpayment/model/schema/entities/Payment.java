@@ -31,7 +31,7 @@ public class Payment {
     private Integer pharmacyId;
 
     @Column(name = "payment_invoice_number")
-    private Integer invoiceNumber;
+    private Long invoiceNumber;
 
     @Column(name = "payment_date")
     private Instant dueDate;

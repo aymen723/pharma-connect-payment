@@ -2,16 +2,17 @@ package dz.pharmaconnect.pharmaconnectpayment.Controllers;
 
 import java.util.List;
 
-import chargily.epay.java.Invoice;
-import chargily.epay.java.PaymentMethod;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import chargily.epay.java.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.PaymentRequest;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.responses.Invoice;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.responses.InvoiceResponse;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.Payment;
 import dz.pharmaconnect.pharmaconnectpayment.services.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -43,4 +44,19 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(url);
     }
 
+    @PostMapping("/status")
+    public void status(@RequestBody InvoiceResponse object) {
+
+        System.out.println(object.getInvoice().getClient());
+        // ObjectMapper mapper = new ObjectMapper();
+        // try {
+        // ConfirmationResponse obj = mapper.readValue(object,
+        // ConfirmationResponse.class);
+        // System.out.println(obj.getClient());
+
+        // } catch (JsonProcessingException e) {
+        // System.out.println(e.getMessage());
+        // }
+        // return ResponseEntity.status(HttpStatus.ACCEPTED).body("worked");
+    }
 }
