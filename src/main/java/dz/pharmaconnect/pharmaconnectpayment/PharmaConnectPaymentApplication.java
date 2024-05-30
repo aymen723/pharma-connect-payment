@@ -2,15 +2,19 @@ package dz.pharmaconnect.pharmaconnectpayment;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
 public class PharmaConnectPaymentApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PharmaConnectPaymentApplication.class, args);
+    public static void main(String[] args) {
+        SpringApplication.run(PharmaConnectPaymentApplication.class, args);
 
-		System.out.println("a");
+        System.out.println("a");
 
-	}
+    }
 
 }

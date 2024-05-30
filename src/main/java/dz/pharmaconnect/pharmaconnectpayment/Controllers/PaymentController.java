@@ -2,6 +2,8 @@ package dz.pharmaconnect.pharmaconnectpayment.Controllers;
 
 import java.util.List;
 
+import dz.pharmaconnect.pharmaconnectpayment.client.StockClient;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,11 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final StockClient stockClient;
 
     @GetMapping("/test")
-    public String test() {
-        return "hello";
+    public ResponseEntity<Order> test() {
+        return ResponseEntity.ok(stockClient.getOrderById(1L));
     }
 
     @GetMapping("/getPayments")
@@ -35,6 +38,7 @@ public class PaymentController {
         List<Payment> payments = paymentService.getAll();
         return ResponseEntity.ok(payments);
     }
+
 
     @PostMapping("/createPayment")
     @ResponseStatus(HttpStatus.CREATED)
@@ -57,6 +61,6 @@ public class PaymentController {
         // } catch (JsonProcessingException e) {
         // System.out.println(e.getMessage());
         // }
-         return ResponseEntity.status(HttpStatus.ACCEPTED).body("worked");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("worked");
     }
 }

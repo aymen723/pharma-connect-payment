@@ -1,0 +1,8 @@
+package dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock;
+
+public enum OrderStatus {
+    PENDING,
+    CANCELED,
+    DELIVERING,
+    FINALISED
+}
