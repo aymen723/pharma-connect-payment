@@ -4,6 +4,7 @@ import java.util.List;
 
 import dz.pharmaconnect.pharmaconnectpayment.client.StockClient;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Pharmacy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,9 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final StockClient stockClient;
 
-    @GetMapping("/test")
-    public ResponseEntity<Order> test() {
-        return ResponseEntity.ok(stockClient.getOrderById(1L));
+    @GetMapping("/test/{orderId}")
+    public ResponseEntity<Order> test(@PathVariable Long orderId) {
+        return ResponseEntity.ok(stockClient.getOrderById(orderId));
     }
 
     @GetMapping("/getPayments")
