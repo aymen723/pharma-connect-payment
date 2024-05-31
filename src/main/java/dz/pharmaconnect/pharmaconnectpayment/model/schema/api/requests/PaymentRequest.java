@@ -1,6 +1,7 @@
 package dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests;
 
 import java.time.Instant;
+import java.util.List;
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.Column;
@@ -14,21 +15,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentRequest {
-
-    @NonNull
-    private Integer orderid;
-
     @NonNull
     private Integer pharmacyId;
 
     @NonNull
-    private Double checkoutPrice;
+    private List<Integer> prodcutsId;
 
     @NonNull
     private Integer userId;
 
     private Instant orderDate;
 
-    private Integer orderPrice;
 
 }

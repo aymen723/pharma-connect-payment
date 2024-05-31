@@ -2,6 +2,8 @@ package dz.pharmaconnect.pharmaconnectpayment.services;
 
 import java.util.List;
 
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.Account;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.PaymentRequest;
 import org.springframework.stereotype.Service;
 
@@ -27,36 +29,40 @@ public class PaymentService {
         return paymentRepo.findAll();
     }
 
-    public String createPayment(PaymentRequest paymentRequest) {
+    public String createPayment(Order order , Account account) {
+        var delivery = 200;
+        var tax = 50;
+
+        
         Payment payment = Payment.builder()
-                .pharmacyId(paymentRequest.getPharmacyId())
-                .userId(paymentRequest.getUserId())
-                .amount(paymentRequest.getCheckoutPrice())
+                .pharmacyId(order.getPharmacy().getId())
+                .userId(order.getAccountId())
+                .Checkoutprice(order.getPrice()+delivery+tax)
                 .comment("test")
-                .discount(5.0)
                 .invoiceNumber(1L)
                 .paymentStatus(Status.pending)
                 .option(PaymentMethod.EDAHABIA)
-                .dueDate(paymentRequest.getOrderDate())
+                .dueDate(order.getDate())
                 .build();
 
-        paymentRepo.save(payment);
 
         Invoice invoice = new Invoice(
-                "Chakhoum Ahmed",
-                "rainxh11@gmail.com",
-                payment.getDiscount(),
+                account.getUsername(),
+                account.getEmail(),
+                1.0,
                 "https://backend.com/webhook_endpoint",
                 "https://frontend.com",
                 payment.getOption(),
                 payment.getInvoiceNumber().toString(),
-                payment.getAmount());
+                //payment.getCheckoutprice()
+                100.0);
 
         try {
 
             ChargilyResponse response = client.submitInvoice(invoice);
             if (response.isSuccess()) {
                 System.out.println("am here inside the if ");
+                paymentRepo.save(payment);
                 response.getStatusCode();
                 response.getCheckoutUrl();
                 System.out.println(response.getStatusCode());

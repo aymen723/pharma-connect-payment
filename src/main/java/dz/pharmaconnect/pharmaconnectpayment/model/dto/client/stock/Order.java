@@ -27,8 +27,8 @@ public class Order {
     private Instant date;
 
 
-    private Integer price;
+    private Double price;
 
-    private Integer checkoutPrice;
-    private Integer deliveryPrice;
+    private Double checkoutPrice;
+    private Double deliveryPrice;
 }

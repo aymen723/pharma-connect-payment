@@ -25,7 +25,7 @@ public class Payment {
     private Integer paymentId;
 
     @Column(name = "payment_user_id")
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "payment_pharmacy_id")
     private Integer pharmacyId;
@@ -36,11 +36,11 @@ public class Payment {
     @Column(name = "payment_date")
     private Instant dueDate;
 
-    @Column(name = "payment_amount")
-    private Double amount;
+    @Column(name = "checkout_price")
+    private Double Checkoutprice;
 
-    @Column(name = "payment_discount")
-    private Double discount;
+   // @Column(name = "payment_discount")
+   // private Double discount;
 
     @Column(name = "payment_comment")
     private String comment;
