@@ -62,8 +62,11 @@ public class PaymentController {
 
     @PostMapping("/webhook")
     @ResponseStatus
-    public void updatestatus(@RequestBody String res){
-        System.out.println(res);
+    public String UpdatePayment(@RequestBody InvoiceResponse res){
+
+
+
+        return "nice ya rkhiss";
     }
 
     
