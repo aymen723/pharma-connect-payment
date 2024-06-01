@@ -1,12 +1,12 @@
-package dz.pharmaconnect.pharmaconnectpayment.config.client;
+package dz.pharmaconnect.pharmaconnectpayment.client.config;
 
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-public class StockClientConfig {
+public class MicroServiceClientConfig {
 
-    @Value("${application.client.authToken}")
+    @Value("${application.jwt.server.token}")
     private String token;
 
     @Bean
