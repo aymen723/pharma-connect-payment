@@ -4,7 +4,7 @@ public enum Status {
 
     pending,
     processing,
-    success,
+    paid,
 
     failed;
 

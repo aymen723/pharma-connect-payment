@@ -22,8 +22,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain getSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-//             .csrf(csrf -> csrf.disable())
-//             .cors(cors -> cors.disable())
+             .csrf(csrf -> csrf.disable())
+             .cors(cors -> cors.disable())
 //                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

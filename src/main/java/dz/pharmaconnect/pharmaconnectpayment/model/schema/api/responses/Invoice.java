@@ -5,6 +5,7 @@ import java.util.Date;
 
 import chargily.epay.java.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
 import jakarta.persistence.EnumType;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Invoice {
 
     private Integer id;
@@ -56,11 +58,10 @@ public class Invoice {
     private Integer api_key_id;
     //
     private Integer meta_data;
-    //
-    private Date due_date;
-    //
-    private Date created_at;
 
-    private Date updated_at;
+   private String due_date;
 
+    private String created_at;
+
+    private String updated_at;
 }

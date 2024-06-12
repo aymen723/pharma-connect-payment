@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.Payment;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
 }

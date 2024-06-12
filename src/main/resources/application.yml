@@ -2,7 +2,7 @@ spring:
   application:
     name: pharma_connect_payment
   datasource:
-    url: jdbc:postgresql://192.168.1.8:5432/payment
+    url: jdbc:postgresql://localhost:5432/payment
     password: password
     username: admin
   jpa:
@@ -22,11 +22,28 @@ eureka:
 server:
   port: 8060
 
+
+logging:
+  level:
+    org:
+      springframework.web: "debug"
+      springframework:
+        web:
+          servlet:
+            mvc:
+              method:
+                annotation=DEBUG:
+      hibernate:
+        sql: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
+
 application:
   jwt:
     secret: PxgfrbwwEfYXAf26-tZxhbXfez0ycDWhkPuOdmYGTqU
     server:
-      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJQaGFybWFDb25uZWN0Iiwic3ViIjoiXCJzdG9jay1zZXJ2aWNlXCIiLCJyb2xlIjoiU0VSVklDRSIsImlhdCI6MTcxNTI2Nzg5Nn0.KiQcFHAmucMY_NUEOtsoaZHCjrdzgHhG1rcIr_fktvI
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJQaGFybWFDb25uZWN0Iiwic3ViIjoicGFpeW1lbnQiLCJyb2xlIjoiU0VSVklDRSIsInRva2VuVHlwZSI6IkFDQ0VTUyIsImlhdCI6MTcxNzg0NjYyNX0.w89B1qHWyuj5gQdHeTcM99hU7H8Mk1D9-y8slby9mvQ
 
 
 

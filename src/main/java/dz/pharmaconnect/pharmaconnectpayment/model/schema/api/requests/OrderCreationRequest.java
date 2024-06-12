@@ -2,12 +2,14 @@ package dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
+@Builder
 public class OrderCreationRequest {
 
 

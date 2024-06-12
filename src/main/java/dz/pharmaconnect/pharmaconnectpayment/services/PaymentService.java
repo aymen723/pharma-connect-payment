@@ -1,10 +1,11 @@
 package dz.pharmaconnect.pharmaconnectpayment.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.Account;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
-import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.PaymentRequest;
+import org.hibernate.FetchNotFoundException;
 import org.springframework.stereotype.Service;
 
 import chargily.epay.java.ChargilyClient;
@@ -29,21 +30,15 @@ public class PaymentService {
         return paymentRepo.findAll();
     }
 
-    public String createPayment(Order order , Account account) {
+    public Optional<Payment> get(Long ID){
+        return paymentRepo.findById(ID);
+    }
+
+    public Payment createPayment(Order order , Account account) {
         var delivery = 200;
         var tax = 50;
 
-        
-        Payment payment = Payment.builder()
-                .pharmacyId(order.getPharmacy().getId())
-                .userId(order.getAccountId())
-                .Checkoutprice(order.getPrice()+delivery+tax)
-                .comment("test")
-                .invoiceNumber(1L)
-                .paymentStatus(Status.pending)
-                .option(PaymentMethod.EDAHABIA)
-                .dueDate(order.getDate())
-                .build();
+
 
 
         Invoice invoice = new Invoice(
@@ -52,29 +47,48 @@ public class PaymentService {
                 1.0,
                 "https://backend.com/webhook_endpoint",
                 "https://frontend.com",
-                payment.getOption(),
-                payment.getInvoiceNumber().toString(),
-                //payment.getCheckoutprice()
-                100.0);
+                PaymentMethod.EDAHABIA,
+                order.getSecret().toString(),
+                order.getPrice()+delivery+tax
+                );
 
         try {
 
             ChargilyResponse response = client.submitInvoice(invoice);
             if (response.isSuccess()) {
                 System.out.println("am here inside the if ");
-                paymentRepo.save(payment);
+
+
                 response.getStatusCode();
+
                 response.getCheckoutUrl();
+
+
+                Payment payment = Payment.builder()
+                        .paymentId(order.getId())
+                        .pharmacyId(order.getPharmacy().getId())
+                        .userId(order.getAccountId())
+                        .Checkoutprice(order.getPrice()+delivery+tax)
+                        .comment("test")
+                        .deliveryId(order.getDeliveryId())
+                        .invoiceNumber(order.getSecret().toString())
+                        .paymentStatus(Status.pending)
+                        .option(PaymentMethod.EDAHABIA)
+                        .dueDate(order.getDate())
+                        .checkouturl(response.getCheckoutUrl())
+                        .build();
+                paymentRepo.save(payment);
+
                 System.out.println(response.getStatusCode());
                 System.out.println(response.getCheckoutUrl());
 
-                return response.getCheckoutUrl();
+                return payment;
             } else {
                 System.out.println("am here inside the eles ");
 
                 response.getStatusCode();
                 response.getErrorBody();
-                return response.getErrorBody();
+                return null;
 
             }
 
@@ -84,8 +98,29 @@ public class PaymentService {
             System.out.println(e.getMessage());
         }
 
-        return "Couldnt create payment";
+        return null;
 
+    }
+
+    public void deletePayment(Long ID){
+        paymentRepo.deleteById(ID);
+    }
+
+    public Payment updatePayment(Long paymentId, Payment updatedPayment) {
+        return paymentRepo.findById(paymentId).map(existingPayment -> {
+            existingPayment.setUserId(updatedPayment.getUserId());
+            existingPayment.setPharmacyId(updatedPayment.getPharmacyId());
+            existingPayment.setInvoiceNumber(updatedPayment.getInvoiceNumber());
+            existingPayment.setDueDate(updatedPayment.getDueDate());
+            existingPayment.setCheckoutprice(updatedPayment.getCheckoutprice());
+            existingPayment.setCheckouturl(updatedPayment.getCheckouturl());
+            existingPayment.setDeliveryId(updatedPayment.getDeliveryId());
+            existingPayment.setComment(updatedPayment.getComment());
+            existingPayment.setPaymentStatus(updatedPayment.getPaymentStatus());
+            existingPayment.setOption(updatedPayment.getOption());
+
+            return paymentRepo.save(existingPayment);
+        }).orElseThrow(() -> new FetchNotFoundException("Payment not found with ID: " , paymentId));
     }
 
 }

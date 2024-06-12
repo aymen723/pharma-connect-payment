@@ -4,11 +4,10 @@ import dz.pharmaconnect.pharmaconnectpayment.client.config.MicroServiceClientCon
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Pharmacy;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderCreationRequest;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderUpdateRequest;
+import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "PHARMA-CONNECT-STOCK-SERVICE", configuration = MicroServiceClientConfig.class)
 public interface StockClient {
@@ -22,6 +21,9 @@ public interface StockClient {
 
     @PostMapping("/api/v1/orders")
     Order CreateOrder(@RequestBody OrderCreationRequest request);
+
+    @PutMapping("/api/v1/orders")
+    Order patchOrder(@RequestBody OrderUpdateRequest order);
 
 
 }

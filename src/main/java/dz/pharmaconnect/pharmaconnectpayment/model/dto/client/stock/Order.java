@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,6 +18,8 @@ public class Order {
 
     private Long accountId;
 
+    private UUID secret;
+
 
     private Pharmacy pharmacy;
 
@@ -26,6 +29,7 @@ public class Order {
 
     private Instant date;
 
+    private Long deliveryId;
 
     private Double price;
 
