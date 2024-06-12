@@ -1,5 +1,6 @@
 package dz.pharmaconnect.pharmaconnectpayment.Controllers;
 
+import java.time.Instant;
 import java.util.List;
 
 import chargily.epay.java.PaymentMethod;
@@ -112,6 +113,10 @@ public class PaymentController {
 
             stockClient.patchOrder(updateorder);
 
+            Instant duedate = Instant.now();
+
+
+
             Payment payment = Payment.builder()
                     .paymentId(order.getId())
                     .pharmacyId(order.getPharmacy().getId())
@@ -122,7 +127,7 @@ public class PaymentController {
                     .invoiceNumber(object.getInvoice().getInvoice_number())
                     .paymentStatus(Status.paid)
                     .option(object.getInvoice().getMode())
-                    .dueDate(object.getInvoice().getDue_date())
+                    .dueDate(duedate)
                     .build();
             return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(),payment));
         }
