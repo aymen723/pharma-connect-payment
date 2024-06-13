@@ -130,19 +130,46 @@ public class PaymentController {
                     .dueDate(duedate)
                     .build();
             return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(),payment));
+        } else if (object.getInvoice().getStatus() == Status.failed) {
+
+            Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
+            OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
+                    .id(order.getId())
+                    .status(OrderStatus.CANCELED)
+                    .deliveryId(order.getDeliveryId())
+                    .checkoutPrice(object.getInvoice().getDue_amount())
+                    .deliveryPrice(100.0)
+                    .build();
+
+            stockClient.patchOrder(updateorder);
+
+            Instant duedate = Instant.now();
+
+
+
+            Payment payment = Payment.builder()
+                    .paymentId(order.getId())
+                    .pharmacyId(order.getPharmacy().getId())
+                    .userId(order.getAccountId())
+                    .Checkoutprice(object.getInvoice().getDue_amount())
+                    .comment("test")
+                    .deliveryId(order.getDeliveryId())
+                    .invoiceNumber(object.getInvoice().getInvoice_number())
+                    .paymentStatus(Status.failed)
+                    .option(object.getInvoice().getMode())
+                    .dueDate(duedate)
+                    .build();
+            return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(),payment));
         }
-
-
 
 
         }catch (Exception e){
             System.out.println(e.getMessage());
 
+            return  ResponseEntity.ok(null);
         }
+        return  ResponseEntity.ok(null);
 
-
-        System.out.println(res);
-        return ResponseEntity.ok(null);
     }
 
 
