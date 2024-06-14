@@ -172,5 +172,10 @@ public class PaymentController {
 
     }
 
+    @GetMapping("/{UserId}/User")
+    @PermitAll
+    public ResponseEntity<List<Payment>> fetchUserpayment(@PathVariable Long paymentId) {
+    return  ResponseEntity.ok( paymentService.getUserPayments(paymentId));
+    }
 
 }

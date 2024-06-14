@@ -106,6 +106,12 @@ public class PaymentService {
         paymentRepo.deleteById(ID);
     }
 
+
+    public List<Payment> getUserPayments(Long userId) {
+        return paymentRepo.findByUserId(userId);
+    }
+
+
     public Payment updatePayment(Long paymentId, Payment updatedPayment) {
         return paymentRepo.findById(paymentId).map(existingPayment -> {
             existingPayment.setUserId(updatedPayment.getUserId());

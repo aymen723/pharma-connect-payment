@@ -24,6 +24,9 @@ public class OrderCreationRequest {
         @Valid
         private List<PurchaseRequest> products;
 
+        @NotEmpty
+        private Boolean delivery;
+
 
         @Data
         public static class PurchaseRequest {
