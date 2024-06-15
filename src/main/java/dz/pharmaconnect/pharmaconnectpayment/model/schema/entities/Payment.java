@@ -39,20 +39,21 @@ public class Payment {
     @Column(name = "checkout_price")
     private Double Checkoutprice;
 
-    @Column(name="checkout_url")
-    private  String checkouturl;
+    @Column(name = "checkout_url")
+    private String checkouturl;
 
-   // @Column(name = "payment_discount")
-   // private Double discount;
+    // @Column(name = "payment_discount")
+    // private Double discount;
 
-    @Column(name="delivery_id")
-    private  Long deliveryId;
+    @Column(name = "delivery_id")
+    private Long deliveryId;
 
     @Column(name = "payment_comment")
     private String comment;
 
 
-
+    @Column(name = "payment_order_id")
+    private Long orderId;
 
     @Column(name = "payment_status")
     @Enumerated(EnumType.STRING)

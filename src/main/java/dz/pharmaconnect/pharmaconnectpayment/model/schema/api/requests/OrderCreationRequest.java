@@ -13,32 +13,30 @@ import java.util.List;
 public class OrderCreationRequest {
 
 
+    @Null
+    private Long accountId;
 
-        @Null
-        private Long accountId;
+    @NotNull
+    private Integer pharmacyId;
+
+    @NotEmpty
+    @Valid
+    private List<PurchaseRequest> products;
+
+    @NotNull
+    private Boolean delivery;
+
+
+    @Data
+    public static class PurchaseRequest {
+        @NotNull
+        private Integer productId;
 
         @NotNull
-        private Integer pharmacyId;
-
-        @NotEmpty
-        @Valid
-        private List<PurchaseRequest> products;
-
-        @NotEmpty
-        private Boolean delivery;
-
-
-        @Data
-        public static class PurchaseRequest {
-            @NotNull
-            private Integer productId;
-
-            @NotNull
-            @Max(5)
-            @Min(1)
-            private Integer count;
-        }
-
+        @Max(5)
+        @Min(1)
+        private Integer count;
+    }
 
 
 }
