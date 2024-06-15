@@ -30,15 +30,13 @@ public class PaymentService {
         return paymentRepo.findAll();
     }
 
-    public Optional<Payment> get(Long ID){
+    public Optional<Payment> get(Long ID) {
         return paymentRepo.findById(ID);
     }
 
-    public Payment createPayment(Order order , Account account) {
+    public Payment createPayment(Order order, Account account) {
         var delivery = 200;
         var tax = 50;
-
-
 
 
         Invoice invoice = new Invoice(
@@ -49,8 +47,8 @@ public class PaymentService {
                 "https://frontend.com",
                 PaymentMethod.EDAHABIA,
                 order.getSecret().toString(),
-                order.getPrice()+delivery+tax
-                );
+                order.getPrice() + delivery + tax
+        );
 
         try {
 
@@ -65,10 +63,10 @@ public class PaymentService {
 
 
                 Payment payment = Payment.builder()
-                        .paymentId(order.getId())
+                        .orderId(order.getId())
                         .pharmacyId(order.getPharmacy().getId())
                         .userId(order.getAccountId())
-                        .Checkoutprice(order.getPrice()+delivery+tax)
+                        .Checkoutprice(order.getPrice() + delivery + tax)
                         .comment("test")
                         .deliveryId(order.getDeliveryId())
                         .invoiceNumber(order.getSecret().toString())
@@ -102,7 +100,7 @@ public class PaymentService {
 
     }
 
-    public void deletePayment(Long ID){
+    public void deletePayment(Long ID) {
         paymentRepo.deleteById(ID);
     }
 
@@ -126,7 +124,7 @@ public class PaymentService {
             existingPayment.setOption(updatedPayment.getOption());
 
             return paymentRepo.save(existingPayment);
-        }).orElseThrow(() -> new FetchNotFoundException("Payment not found with ID: " , paymentId));
+        }).orElseThrow(() -> new FetchNotFoundException("Payment not found with ID: ", paymentId));
     }
 
 }

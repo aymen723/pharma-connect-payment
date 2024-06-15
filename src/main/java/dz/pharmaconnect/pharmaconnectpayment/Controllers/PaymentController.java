@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@CrossOrigin()
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -66,7 +66,7 @@ public class PaymentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<String> createPayment(@Valid @RequestBody OrderCreationRequest request, @RequestAttribute Long userAccountId) {
+    public ResponseEntity<Payment> createPayment(@Valid @RequestBody OrderCreationRequest request, @RequestAttribute Long userAccountId) {
 
 
         request.setAccountId(userAccountId);
@@ -77,15 +77,15 @@ public class PaymentController {
         Payment res = paymentService.createPayment(Order, account);
 
         OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
-                        .id(Order.getId())
-                                .status(OrderStatus.PENDING)
-                                        .deliveryId(res.getDeliveryId())
-                                                .checkoutPrice(res.getCheckoutprice())
-                                                        .deliveryPrice(100.0).build();
+                .id(Order.getId())
+                .status(OrderStatus.PENDING)
+                .deliveryId(res.getDeliveryId())
+                .checkoutPrice(res.getCheckoutprice())
+                .deliveryPrice(100.0).build();
 
 
         stockClient.patchOrder(updateorder);
-        return ResponseEntity.ok(res.getCheckouturl());
+        return ResponseEntity.ok(res);
 
     }
 
@@ -99,83 +99,81 @@ public class PaymentController {
 
         try {
 
-        InvoiceResponse object = objectmapper.readValue(res , InvoiceResponse.class);
+            InvoiceResponse object = objectmapper.readValue(res, InvoiceResponse.class);
 
-        if(object.getInvoice().getStatus() == Status.paid){
-            Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
-            OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
-                    .id(order.getId())
-                    .status(OrderStatus.PAID)
-                    .deliveryId(order.getDeliveryId())
-                    .checkoutPrice(object.getInvoice().getDue_amount())
-                    .deliveryPrice(100.0)
-                    .build();
+            if (object.getInvoice().getStatus() == Status.paid) {
+                Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
+                OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
+                        .id(order.getId())
+                        .status(OrderStatus.PAID)
+                        .deliveryId(order.getDeliveryId())
+                        .checkoutPrice(object.getInvoice().getDue_amount())
+                        .deliveryPrice(100.0)
+                        .build();
 
-            stockClient.patchOrder(updateorder);
+                stockClient.patchOrder(updateorder);
 
-            Instant duedate = Instant.now();
-
-
-
-            Payment payment = Payment.builder()
-                    .paymentId(order.getId())
-                    .pharmacyId(order.getPharmacy().getId())
-                    .userId(order.getAccountId())
-                    .Checkoutprice(object.getInvoice().getDue_amount())
-                    .comment("test")
-                    .deliveryId(order.getDeliveryId())
-                    .invoiceNumber(object.getInvoice().getInvoice_number())
-                    .paymentStatus(Status.paid)
-                    .option(object.getInvoice().getMode())
-                    .dueDate(duedate)
-                    .build();
-            return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(),payment));
-        } else if (object.getInvoice().getStatus() == Status.failed) {
-
-            Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
-            OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
-                    .id(order.getId())
-                    .status(OrderStatus.CANCELED)
-                    .deliveryId(order.getDeliveryId())
-                    .checkoutPrice(object.getInvoice().getDue_amount())
-                    .deliveryPrice(100.0)
-                    .build();
-
-            stockClient.patchOrder(updateorder);
-
-            Instant duedate = Instant.now();
+                Instant duedate = Instant.now();
 
 
+                Payment payment = Payment.builder()
+                        .paymentId(order.getId())
+                        .pharmacyId(order.getPharmacy().getId())
+                        .userId(order.getAccountId())
+                        .Checkoutprice(object.getInvoice().getDue_amount())
+                        .comment("test")
+                        .deliveryId(order.getDeliveryId())
+                        .invoiceNumber(object.getInvoice().getInvoice_number())
+                        .paymentStatus(Status.paid)
+                        .option(object.getInvoice().getMode())
+                        .dueDate(duedate)
+                        .build();
+                return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(), payment));
+            } else if (object.getInvoice().getStatus() == Status.failed) {
 
-            Payment payment = Payment.builder()
-                    .paymentId(order.getId())
-                    .pharmacyId(order.getPharmacy().getId())
-                    .userId(order.getAccountId())
-                    .Checkoutprice(object.getInvoice().getDue_amount())
-                    .comment("test")
-                    .deliveryId(order.getDeliveryId())
-                    .invoiceNumber(object.getInvoice().getInvoice_number())
-                    .paymentStatus(Status.failed)
-                    .option(object.getInvoice().getMode())
-                    .dueDate(duedate)
-                    .build();
-            return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(),payment));
-        }
+                Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
+                OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
+                        .id(order.getId())
+                        .status(OrderStatus.CANCELED)
+                        .deliveryId(order.getDeliveryId())
+                        .checkoutPrice(object.getInvoice().getDue_amount())
+                        .deliveryPrice(100.0)
+                        .build();
+
+                stockClient.patchOrder(updateorder);
+
+                Instant duedate = Instant.now();
 
 
-        }catch (Exception e){
+                Payment payment = Payment.builder()
+                        .paymentId(order.getId())
+                        .pharmacyId(order.getPharmacy().getId())
+                        .userId(order.getAccountId())
+                        .Checkoutprice(object.getInvoice().getDue_amount())
+                        .comment("test")
+                        .deliveryId(order.getDeliveryId())
+                        .invoiceNumber(object.getInvoice().getInvoice_number())
+                        .paymentStatus(Status.failed)
+                        .option(object.getInvoice().getMode())
+                        .dueDate(duedate)
+                        .build();
+                return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(), payment));
+            }
+
+
+        } catch (Exception e) {
             System.out.println(e.getMessage());
 
-            return  ResponseEntity.ok(null);
+            return ResponseEntity.ok(null);
         }
-        return  ResponseEntity.ok(null);
+        return ResponseEntity.ok(null);
 
     }
 
     @GetMapping("/{UserId}/User")
     @PermitAll
     public ResponseEntity<List<Payment>> fetchUserpayment(@PathVariable Long paymentId) {
-    return  ResponseEntity.ok( paymentService.getUserPayments(paymentId));
+        return ResponseEntity.ok(paymentService.getUserPayments(paymentId));
     }
 
 }
