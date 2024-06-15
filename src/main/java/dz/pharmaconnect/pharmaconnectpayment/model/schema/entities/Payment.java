@@ -45,8 +45,15 @@ public class Payment {
     // @Column(name = "payment_discount")
     // private Double discount;
 
-    @Column(name = "delivery_id")
+    @Column(name = "payment_delivery_id")
     private Long deliveryId;
+
+
+    @Column(name = "payment_delivery_price")
+    private Double deliveryPrice;
+
+    @Column(name = "transactionFee")
+    private Double transactionFee;
 
     @Column(name = "payment_comment")
     private String comment;

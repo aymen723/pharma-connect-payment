@@ -1,4 +1,5 @@
 package dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests;
+
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,8 @@ public class OrderUpdateRequest {
     private OrderStatus status;
     private Double checkoutPrice;
 
-    private Double deliveryPrice;
+    private Long paymentId;
+
 
     private Long deliveryId;
 

@@ -16,10 +16,12 @@ import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import org.hibernate.FetchNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,10 +45,16 @@ public class PaymentController {
     private final AuthClient authClient;
 
     @GetMapping("/{paymentId}")
-    @PermitAll
-    public ResponseEntity<Payment> fetchPayment(@PathVariable Long paymentId) {
-        return ResponseEntity.ok(paymentService.get(paymentId).get());
+    @PreAuthorize("hasAnyAuthority('CLIENT','SERVICE')")
+    public ResponseEntity<Payment> fetchPayment(@PathVariable Long paymentId, @RequestAttribute(required = false) Long userAccountId) {
+        var payment = paymentService.get(paymentId).orElseThrow(() -> new FetchNotFoundException("payment", paymentId));
+        var authority = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().findFirst().get().getAuthority();
+        if (authority.equals(Account.AccountRole.CLIENT.name()) && !payment.getUserId().equals(userAccountId)) {
+            throw new IllegalStateException();
+        }
+        return ResponseEntity.ok(payment);
     }
+
 
     @GetMapping()
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -55,6 +63,7 @@ public class PaymentController {
         List<Payment> payments = paymentService.getAll();
         return ResponseEntity.ok(payments);
     }
+
 
     @GetMapping("/test")
     @PreAuthorize("permitAll()")
@@ -81,7 +90,8 @@ public class PaymentController {
                 .status(OrderStatus.PENDING)
                 .deliveryId(res.getDeliveryId())
                 .checkoutPrice(res.getCheckoutprice())
-                .deliveryPrice(100.0).build();
+                .paymentId(res.getPaymentId())
+                .build();
 
 
         stockClient.patchOrder(updateorder);
@@ -108,7 +118,7 @@ public class PaymentController {
                         .status(OrderStatus.PAID)
                         .deliveryId(order.getDeliveryId())
                         .checkoutPrice(object.getInvoice().getDue_amount())
-                        .deliveryPrice(100.0)
+
                         .build();
 
                 stockClient.patchOrder(updateorder);
@@ -137,7 +147,7 @@ public class PaymentController {
                         .status(OrderStatus.CANCELED)
                         .deliveryId(order.getDeliveryId())
                         .checkoutPrice(object.getInvoice().getDue_amount())
-                        .deliveryPrice(100.0)
+
                         .build();
 
                 stockClient.patchOrder(updateorder);
