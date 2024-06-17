@@ -39,7 +39,7 @@ public class PaymentService {
         return paymentRepo.findByOrderId(orderId);
     }
 
-    public Payment createPayment(Order order, Account account) {
+    public Payment createPayment(Order order, Account account, boolean delivering) {
         var delivery = 200.0;
         var tax = 50.0;
 
@@ -74,7 +74,7 @@ public class PaymentService {
                         .Checkoutprice(order.getPrice() + delivery + tax)
                         .comment("test")
 
-                        .deliveryId(order.getDeliveryId())
+
                         .invoiceNumber(order.getSecret().toString())
                         .paymentStatus(Status.pending)
                         .option(PaymentMethod.EDAHABIA)
@@ -83,7 +83,8 @@ public class PaymentService {
                         .checkouturl(response.getCheckoutUrl())
                         .build();
 
-                if (payment.getDeliveryId() != null) {
+                if (delivering) {
+                    payment.setDeliveryId(3L);
                     payment.setDeliveryPrice(delivery);
                 }
                 paymentRepo.save(payment);

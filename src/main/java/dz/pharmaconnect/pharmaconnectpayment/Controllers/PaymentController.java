@@ -45,12 +45,18 @@ public class PaymentController {
     private final AuthClient authClient;
 
     @GetMapping("/{paymentId}")
-    @PreAuthorize("hasAnyAuthority('CLIENT','SERVICE')")
+    @PreAuthorize("hasAnyAuthority('CLIENT','SERVICE', 'PHARMACY')")
     public ResponseEntity<Payment> fetchPayment(@PathVariable Long paymentId, @RequestAttribute(required = false) Long userAccountId) {
         var payment = paymentService.get(paymentId).orElseThrow(() -> new FetchNotFoundException("payment", paymentId));
         var authority = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().findFirst().get().getAuthority();
         if (authority.equals(Account.AccountRole.CLIENT.name()) && !payment.getUserId().equals(userAccountId)) {
             throw new IllegalStateException();
+        }
+        if (authority.equals(Account.AccountRole.PHARMACY.name())) {
+            var pharmacy = stockClient.getPharmacyByOrderId(payment.getOrderId());
+            if (pharmacy.getAccountId() != userAccountId) {
+                throw new IllegalStateException();
+            }
         }
         return ResponseEntity.ok(payment);
     }
@@ -83,7 +89,7 @@ public class PaymentController {
         var Order = stockClient.CreateOrder(request);
         var account = authClient.getAccount(userAccountId);
 
-        Payment res = paymentService.createPayment(Order, account);
+        Payment res = paymentService.createPayment(Order, account, true);
 
         OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
                 .id(Order.getId())
