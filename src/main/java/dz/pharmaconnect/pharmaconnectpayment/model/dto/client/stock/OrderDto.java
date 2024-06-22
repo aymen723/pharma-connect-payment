@@ -1,17 +1,14 @@
 package dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Order {
+public class OrderDto {
 
     private Long id;
 
@@ -21,7 +18,7 @@ public class Order {
     private UUID secret;
 
 
-    private Pharmacy pharmacy;
+    private PharmacyDto pharmacy;
 
 
     private OrderStatus status;

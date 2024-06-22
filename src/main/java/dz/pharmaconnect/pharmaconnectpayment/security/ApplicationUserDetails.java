@@ -1,7 +1,7 @@
 package dz.pharmaconnect.pharmaconnectpayment.security;
 
 
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.Account;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.AccountDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class ApplicationUserDetails implements UserDetails {
-    private final Account account;
+    private final AccountDto account;
 
-    public ApplicationUserDetails(Account account) {
+    public ApplicationUserDetails(AccountDto account) {
         this.account = account;
     }
 
