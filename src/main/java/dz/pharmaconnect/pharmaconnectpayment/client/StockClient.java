@@ -1,11 +1,10 @@
 package dz.pharmaconnect.pharmaconnectpayment.client;
 
 import dz.pharmaconnect.pharmaconnectpayment.client.config.MicroServiceClientConfig;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Pharmacy;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.OrderDto;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.PharmacyDto;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderCreationRequest;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderUpdateRequest;
-import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +13,16 @@ public interface StockClient {
 
 
     @GetMapping("/api/v1/orders/{orderId}")
-    Order getOrderById(@PathVariable Long orderId);
+    OrderDto getOrderById(@PathVariable Long orderId);
 
     @GetMapping("/api/v1/orders/{orderId}/pharmacy")
-    Pharmacy getPharmacyByOrderId(@PathVariable Long orderId);
+    PharmacyDto getPharmacyByOrderId(@PathVariable Long orderId);
 
     @PostMapping("/api/v1/orders")
-    Order CreateOrder(@RequestBody OrderCreationRequest request);
+    OrderDto CreateOrder(@RequestBody OrderCreationRequest request);
 
     @PutMapping("/api/v1/orders")
-    Order patchOrder(@RequestBody OrderUpdateRequest order);
+    OrderDto patchOrder(@RequestBody OrderUpdateRequest order);
 
 
 }

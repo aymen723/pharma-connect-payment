@@ -3,17 +3,19 @@ package dz.pharmaconnect.pharmaconnectpayment.Controllers;
 import java.time.Instant;
 import java.util.List;
 
-import chargily.epay.java.PaymentMethod;
 import dz.pharmaconnect.pharmaconnectpayment.client.AuthClient;
+import dz.pharmaconnect.pharmaconnectpayment.client.DeliveryClient;
 import dz.pharmaconnect.pharmaconnectpayment.client.StockClient;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.Account;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.AccountDto;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.delivery.DeliveryDto;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.delivery.DeliveryStatus;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.OrderDto;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.OrderStatus;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Pharmacy;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.DeliveryCreationRequest;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.DeliveryUpdateRequest;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderCreationRequest;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.OrderUpdateRequest;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import org.hibernate.FetchNotFoundException;
@@ -24,11 +26,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.requests.PaymentRequest;
-import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.responses.Invoice;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.api.responses.InvoiceResponse;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.Payment;
 import dz.pharmaconnect.pharmaconnectpayment.services.PaymentService;
@@ -43,18 +42,19 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final StockClient stockClient;
     private final AuthClient authClient;
+    private final DeliveryClient deliveryClient;
 
     @GetMapping("/{paymentId}")
     @PreAuthorize("hasAnyAuthority('CLIENT','SERVICE', 'PHARMACY')")
     public ResponseEntity<Payment> fetchPayment(@PathVariable Long paymentId, @RequestAttribute(required = false) Long userAccountId) {
         var payment = paymentService.get(paymentId).orElseThrow(() -> new FetchNotFoundException("payment", paymentId));
         var authority = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().findFirst().get().getAuthority();
-        if (authority.equals(Account.AccountRole.CLIENT.name()) && !payment.getUserId().equals(userAccountId)) {
+        if (authority.equals(AccountDto.AccountRole.CLIENT.name()) && !payment.getUserId().equals(userAccountId)) {
             throw new IllegalStateException();
         }
-        if (authority.equals(Account.AccountRole.PHARMACY.name())) {
+        if (authority.equals(AccountDto.AccountRole.PHARMACY.name())) {
             var pharmacy = stockClient.getPharmacyByOrderId(payment.getOrderId());
-            if (pharmacy.getAccountId() != userAccountId) {
+            if (!pharmacy.getAccountId().equals(userAccountId)) {
                 throw new IllegalStateException();
             }
         }
@@ -71,13 +71,6 @@ public class PaymentController {
     }
 
 
-    @GetMapping("/test")
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<String> testS() {
-        return ResponseEntity.ok("account id = " + "userAccountId");
-    }
-
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('CLIENT')")
@@ -86,18 +79,37 @@ public class PaymentController {
 
         request.setAccountId(userAccountId);
 
-        var Order = stockClient.CreateOrder(request);
+        var order = stockClient.CreateOrder(request);
         var account = authClient.getAccount(userAccountId);
+        DeliveryDto delivery = null;
+        if (request.getDelivery()
+        ) {
+            if (request.getY() == null || request.getX() == null) throw new IllegalStateException();
 
-        Payment res = paymentService.createPayment(Order, account, true);
+            delivery = deliveryClient.CreateDelivery(DeliveryCreationRequest.builder()
+                    .accountId(account.getId())
+                    .orderId(order.getId())
+                    .latitude(request.getY())
+                    .longitude(request.getX())
+
+                    .build());
+        }
+
+
+        Payment res = paymentService.createPayment(order, account, delivery);
 
         OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
-                .id(Order.getId())
+                .id(order.getId())
                 .status(OrderStatus.PENDING)
                 .deliveryId(res.getDeliveryId())
                 .checkoutPrice(res.getCheckoutprice())
                 .paymentId(res.getPaymentId())
                 .build();
+
+        if (res.getDeliveryId() != null) {
+            DeliveryDto updatedDelivery = deliveryClient.putDelivery(DeliveryUpdateRequest.builder()
+                    .paymentId(res.getPaymentId()).id(delivery.getId()).status(DeliveryStatus.AWAITING).build());
+        }
 
 
         stockClient.patchOrder(updateorder);
@@ -118,7 +130,7 @@ public class PaymentController {
             InvoiceResponse object = objectmapper.readValue(res, InvoiceResponse.class);
 
             if (object.getInvoice().getStatus() == Status.paid) {
-                Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
+                OrderDto order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
                 OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
                         .id(order.getId())
                         .status(OrderStatus.PAID)
@@ -147,7 +159,7 @@ public class PaymentController {
                 return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(), payment));
             } else if (object.getInvoice().getStatus() == Status.failed) {
 
-                Order order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
+                OrderDto order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
                 OrderUpdateRequest updateorder = OrderUpdateRequest.builder()
                         .id(order.getId())
                         .status(OrderStatus.CANCELED)
@@ -186,10 +198,5 @@ public class PaymentController {
 
     }
 
-    @GetMapping("/{UserId}/User")
-    @PermitAll
-    public ResponseEntity<List<Payment>> fetchUserpayment(@PathVariable Long paymentId) {
-        return ResponseEntity.ok(paymentService.getUserPayments(paymentId));
-    }
 
 }

@@ -1,49 +1,19 @@
 spring:
   application:
-    name: pharma_connect_payment
+    name: payment
+  config:
+    import:
+      - configserver:http://localhost:9000
   datasource:
-    url: jdbc:postgresql://192.168.1.9:5432/payment
+    url: jdbc:postgresql://localhost:5432/payment
     password: password
     username: admin
   jpa:
     hibernate:
-      ddl-auto: create
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-#spring.jpa.database-platform = org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: validate
 
-#API_Key:api_T3sOGKfkxKa6SCAgFlR9vWNf4kVKWMTv4RvopHjOXMqeNRWghDL6iNmQk1nkqjKY
-#SECRET_Key=secret_4b3e62f664f6a103309be1ffa7e6269f9e672195a3dca04d5c8295e2d905a880
-#logging.level.org.springframework.web=DEBUG
 server:
   port: 8060
-
-
-logging:
-  level:
-    org:
-      springframework.web: "debug"
-      springframework:
-        web:
-          servlet:
-            mvc:
-              method:
-                annotation=DEBUG:
-      hibernate:
-        sql: DEBUG
-        type:
-          descriptor:
-            sql: TRACE
-
-application:
-  jwt:
-    secret: PxgfrbwwEfYXAf26-tZxhbXfez0ycDWhkPuOdmYGTqU
-    server:
-      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJQaGFybWFDb25uZWN0Iiwic3ViIjoicGFpeW1lbnQiLCJyb2xlIjoiU0VSVklDRSIsInRva2VuVHlwZSI6IkFDQ0VTUyIsImlhdCI6MTcxNzg0NjYyNX0.w89B1qHWyuj5gQdHeTcM99hU7H8Mk1D9-y8slby9mvQ
 
 
 

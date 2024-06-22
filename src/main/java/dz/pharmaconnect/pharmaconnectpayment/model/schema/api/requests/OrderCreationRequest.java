@@ -27,6 +27,10 @@ public class OrderCreationRequest {
     private Boolean delivery;
 
 
+    private Double x;
+    private Double y;
+
+
     @Data
     public static class PurchaseRequest {
         @NotNull

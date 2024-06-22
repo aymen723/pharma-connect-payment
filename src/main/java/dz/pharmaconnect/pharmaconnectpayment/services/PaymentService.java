@@ -3,8 +3,9 @@ package dz.pharmaconnect.pharmaconnectpayment.services;
 import java.util.List;
 import java.util.Optional;
 
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.Account;
-import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.Order;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.AccountDto;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.delivery.DeliveryDto;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.stock.OrderDto;
 import org.hibernate.FetchNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +40,8 @@ public class PaymentService {
         return paymentRepo.findByOrderId(orderId);
     }
 
-    public Payment createPayment(Order order, Account account, boolean delivering) {
-        var delivery = 200.0;
+    public Payment createPayment(OrderDto order, AccountDto account, DeliveryDto delivery) {
+        var deliveryPrice = 200.0;
         var tax = 50.0;
 
 
@@ -52,7 +53,7 @@ public class PaymentService {
                 "https://frontend.com",
                 PaymentMethod.EDAHABIA,
                 order.getSecret().toString(),
-                order.getPrice() + delivery + tax
+                order.getPrice() + deliveryPrice + tax
         );
 
         try {
@@ -71,7 +72,7 @@ public class PaymentService {
                         .orderId(order.getId())
                         .pharmacyId(order.getPharmacy().getId())
                         .userId(order.getAccountId())
-                        .Checkoutprice(order.getPrice() + delivery + tax)
+                        .Checkoutprice(order.getPrice() + deliveryPrice + tax)
                         .comment("test")
 
 
@@ -83,10 +84,11 @@ public class PaymentService {
                         .checkouturl(response.getCheckoutUrl())
                         .build();
 
-                if (delivering) {
-                    payment.setDeliveryId(3L);
-                    payment.setDeliveryPrice(delivery);
+                if (delivery != null) {
+                    payment.setDeliveryId(delivery.getId());
+                    payment.setDeliveryPrice(deliveryPrice);
                 }
+
                 paymentRepo.save(payment);
 
                 System.out.println(response.getStatusCode());
