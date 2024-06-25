@@ -1,11 +1,16 @@
 package dz.pharmaconnect.pharmaconnectpayment.model.dto;
 
 import chargily.epay.java.PaymentMethod;
+import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.Payment;
 import dz.pharmaconnect.pharmaconnectpayment.model.schema.entities.enums.Status;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.Instant;
 
+@Data
+@Builder
 public class PaymentDto {
 
 
@@ -59,4 +64,25 @@ public class PaymentDto {
     @Column(name = "payment_option")
     @Enumerated(EnumType.STRING)
     private PaymentMethod option;
+
+
+    public static PaymentDto map(Payment payment) {
+        if (payment == null) return null;
+        return PaymentDto.builder()
+                .paymentId(payment.getPaymentId())
+                .userId(payment.getUserId())
+                .pharmacyId(payment.getPharmacyId())
+                .invoiceNumber(payment.getInvoiceNumber())
+                .dueDate(payment.getDueDate())
+                .Checkoutprice(payment.getCheckoutprice())
+                .checkouturl(payment.getCheckouturl())
+                .deliveryId(payment.getDeliveryId())
+                .deliveryPrice(payment.getDeliveryPrice())
+                .transactionFee(payment.getTransactionFee())
+                .comment(payment.getComment())
+                .orderId(payment.getOrderId())
+                .paymentStatus(payment.getPaymentStatus())
+                .option(payment.getOption())
+                .build();
+    }
 }

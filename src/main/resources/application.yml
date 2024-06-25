@@ -3,7 +3,7 @@ spring:
     name: payment
   config:
     import:
-      - configserver:http://localhost:9000
+      - configserver:http://config:9000
   datasource:
     url: jdbc:postgresql://localhost:5432/payment
     password: password

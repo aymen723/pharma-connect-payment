@@ -6,6 +6,7 @@ import java.util.List;
 import dz.pharmaconnect.pharmaconnectpayment.client.AuthClient;
 import dz.pharmaconnect.pharmaconnectpayment.client.DeliveryClient;
 import dz.pharmaconnect.pharmaconnectpayment.client.StockClient;
+import dz.pharmaconnect.pharmaconnectpayment.model.dto.PaymentDto;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.Auth.AccountDto;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.delivery.DeliveryDto;
 import dz.pharmaconnect.pharmaconnectpayment.model.dto.client.delivery.DeliveryStatus;
@@ -46,7 +47,7 @@ public class PaymentController {
 
     @GetMapping("/{paymentId}")
     @PreAuthorize("hasAnyAuthority('CLIENT','SERVICE', 'PHARMACY')")
-    public ResponseEntity<Payment> fetchPayment(@PathVariable Long paymentId, @RequestAttribute(required = false) Long userAccountId) {
+    public ResponseEntity<PaymentDto> fetchPayment(@PathVariable Long paymentId, @RequestAttribute(required = false) Long userAccountId) {
         var payment = paymentService.get(paymentId).orElseThrow(() -> new FetchNotFoundException("payment", paymentId));
         var authority = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().findFirst().get().getAuthority();
         if (authority.equals(AccountDto.AccountRole.CLIENT.name()) && !payment.getUserId().equals(userAccountId)) {
@@ -58,23 +59,14 @@ public class PaymentController {
                 throw new IllegalStateException();
             }
         }
-        return ResponseEntity.ok(payment);
-    }
-
-
-    @GetMapping()
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<List<Payment>> getAllPayments() {
-        List<Payment> payments = paymentService.getAll();
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(PaymentDto.map(payment));
     }
 
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<Payment> createPayment(@Valid @RequestBody OrderCreationRequest request, @RequestAttribute Long userAccountId) {
+    public ResponseEntity<PaymentDto> createPayment(@Valid @RequestBody OrderCreationRequest request, @RequestAttribute Long userAccountId) {
 
 
         request.setAccountId(userAccountId);
@@ -113,7 +105,7 @@ public class PaymentController {
 
 
         stockClient.patchOrder(updateorder);
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(PaymentDto.map(res));
 
     }
 
@@ -121,7 +113,7 @@ public class PaymentController {
     @Consumes(MediaType.ALL_VALUE)
     @ResponseStatus
     @PreAuthorize("permitAll()")
-    public ResponseEntity<Payment> UpdatePayment(@RequestBody String res) {
+    public ResponseEntity<PaymentDto> UpdatePayment(@RequestBody String res) {
 
         ObjectMapper objectmapper = new ObjectMapper();
 
@@ -156,7 +148,7 @@ public class PaymentController {
                         .option(object.getInvoice().getMode())
                         .dueDate(duedate)
                         .build();
-                return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(), payment));
+                return ResponseEntity.ok(PaymentDto.map(paymentService.updatePayment(payment.getPaymentId(), payment)));
             } else if (object.getInvoice().getStatus() == Status.failed) {
 
                 OrderDto order = stockClient.getOrderById(Long.parseLong(object.getInvoice().getInvoice_number()));
@@ -185,7 +177,7 @@ public class PaymentController {
                         .option(object.getInvoice().getMode())
                         .dueDate(duedate)
                         .build();
-                return ResponseEntity.ok(paymentService.updatePayment(payment.getPaymentId(), payment));
+                return ResponseEntity.ok(PaymentDto.map(paymentService.updatePayment(payment.getPaymentId(), payment)));
             }
 
 
